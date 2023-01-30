@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -24,13 +23,13 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  MyHomePage({Key? key, required this.title}) : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -44,72 +43,189 @@ class MyHomePage extends StatefulWidget {
   final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  late List<GDPData> _chartData;
+  late TooltipBehavior _tooltipBehavior;
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  @override
+  void initState() {
+    _chartData = getChartData();
+    _tooltipBehavior = TooltipBehavior(enable: true);
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+    return SafeArea(
+      child: Scaffold(
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 230,
+                  child: SfCircularChart(
+                    annotations: <CircularChartAnnotation>[
+                      CircularChartAnnotation(
+                        widget: Container(
+                          child: const Text.rich(TextSpan(children: <TextSpan>[
+                            TextSpan(
+                              text: '70%',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 40),
+                            ),
+                            TextSpan(
+                                text: ' \n   Capacité restante ',
+                                style: TextStyle(
+                                    fontStyle: FontStyle.italic, fontSize: 8)),
+                          ])),
+                        ),
+                      )
+                    ],
+                    tooltipBehavior: _tooltipBehavior,
+                    series: <CircularSeries>[
+                      RadialBarSeries<GDPData, String>(
+                          dataSource: _chartData,
+                          xValueMapper: (GDPData data, _) => data.nom,
+                          yValueMapper: (GDPData data, _) => data.gdp,
+                          pointColorMapper: (GDPData data, _) => data.color,
+                          // dataLabelSettings: DataLabelSettings(isVisible: true),
+                          trackOpacity: 0.3,
+                          cornerStyle: CornerStyle.bothCurve,
+                          enableTooltip: true,
+                          maximumValue: 100)
+                    ],
+                  ),
+                ),
+                Column(
+                  children: [
+                    Container(
+                      child: Row(
+                        children: const [
+                          Text('-',
+                              style: TextStyle(
+                                  color: Color.fromARGB(255, 135, 38, 31),
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.bold)),
+                          Text("80.0V",
+                              style: TextStyle(
+                                fontSize: 20,
+                              )),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      child: Row(
+                        children: const [
+                          Text('-',
+                              style: TextStyle(
+                                  color: Color.fromARGB(255, 26, 114, 185),
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.bold)),
+                          Text("50.0A",
+                              style: TextStyle(
+                                fontSize: 20,
+                              )),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      child: Row(
+                        children: const [
+                          Text('-',
+                              style: TextStyle(
+                                  color: Color.fromARGB(255, 35, 156, 39),
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.bold)),
+                          Text("75.0%",
+                              style: TextStyle(
+                                fontSize: 20,
+                              )),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      child: Row(
+                        children: const [
+                          Text('-',
+                              style: TextStyle(
+                                  color: Color.fromARGB(255, 135, 38, 31),
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.bold)),
+                          Text("26°C",
+                              style: TextStyle(
+                                fontSize: 20,
+                              )),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      child: Text("Capacité restante",
+                          style: TextStyle(color: Colors.grey)),
+                    ),
+                    Container(
+                      child: Text("150.3/200.0 Ah",
+                          style: TextStyle(color: Colors.green)),
+                    ),
+                    Container(
+                      child: Text("Puissance restante",
+                          style: TextStyle(color: Colors.grey)),
+                    ),
+                    Container(
+                      child: Text("3607.2Wh/4800Wh",
+                          style: TextStyle(color: Colors.green)),
+                    ),
+                  ],
+                ),
+              ],
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+            Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: Container(
+                    alignment: Alignment.bottomCenter,
+                    child: Text(
+                      "VEILLE",
+                      style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const Divider(
+              height: 20,
+              thickness: 2,
+              indent: 20,
+              endIndent: 20,
+              color: Colors.black,
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
+
+  List<GDPData> getChartData() {
+    final List<GDPData> chartData = [
+      GDPData('V', 80, const Color.fromARGB(255, 135, 38, 31)),
+      GDPData('A', 25, const Color.fromARGB(255, 26, 114, 185)),
+      GDPData('%', 75, const Color.fromARGB(255, 35, 156, 39)),
+    ];
+    return chartData;
+  }
+}
+
+class GDPData {
+  GDPData(this.nom, this.gdp, this.color);
+  final String nom;
+  final int gdp;
+  final Color color;
 }
